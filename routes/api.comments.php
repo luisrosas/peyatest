@@ -5,7 +5,7 @@
  */
 $router->get('/', [
     'as' => 'getComments',
-    'uses' => 'Api\Microservices\Comments\CommentsController@index'
+    'uses' => 'CommentsController@index'
 ]);
 
 /**
@@ -13,7 +13,7 @@ $router->get('/', [
  */
 $router->get('/{id}', [
     'as' => 'getComment',
-    'uses' => 'Api\Microservices\Comments\CommentsController@show'
+    'uses' => 'CommentsController@show'
 ]);
 
 /**
@@ -21,7 +21,7 @@ $router->get('/{id}', [
  */
 $router->post('/', [
     'as' => 'createComment',
-    'uses' => 'Api\Microservices\Comments\CommentsController@create'
+    'uses' => 'CommentsController@create'
 ]);
 
 /**
@@ -29,7 +29,7 @@ $router->post('/', [
  */
 $router->put('/{id}', [
     'as' => 'updateComment',
-    'uses' => 'Api\Microservices\Comments\CommentsController@update'
+    'uses' => 'CommentsController@update'
 ]);
 
 /**
@@ -37,5 +37,5 @@ $router->put('/{id}', [
  */
 $router->delete('/{id}', [
     'as' => 'deleteComment',
-    'uses' => 'Api\Microservices\Comments\CommentsController@destroy'
+    'uses' => 'CommentsController@destroy'
 ]);

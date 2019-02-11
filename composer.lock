@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "94305c97d0490a8c0a7a69594e02519a",
+    "content-hash": "27a153643e168ad98105e2b65e6cdf34",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -2847,6 +2847,49 @@
             "time": "2018-06-11T23:09:50+00:00"
         },
         {
+            "name": "niellles/lumen-commands",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Niellles/lumen-commands.git",
+                "reference": "fa195a424d71092a155da767e3a17ab180b11d15"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Niellles/lumen-commands/zipball/fa195a424d71092a155da767e3a17ab180b11d15",
+                "reference": "fa195a424d71092a155da767e3a17ab180b11d15",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/lumen-framework": "5.*.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Niellles\\LumenCommands\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Niels van der Galiën"
+                }
+            ],
+            "description": "Adds artisan commands to Lumen 5 that aren't available by default.",
+            "keywords": [
+                "artisan",
+                "commands",
+                "lumen",
+                "lumen 5",
+                "make",
+                "model"
+            ],
+            "time": "2018-06-28T21:39:19+00:00"
+        },
+        {
             "name": "phar-io/manifest",
             "version": "1.0.3",
             "source": {
@@ -4159,7 +4202,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "niellles/lumen-commands": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

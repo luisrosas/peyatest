@@ -1,16 +1,41 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
-|
-*/
+/**
+ * Obtener todos los comentarios
+ */
+$router->get('/', [
+    'as' => 'getComments',
+    'uses' => 'Api\Microservices\Comments\CommentsController@index'
+]);
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
-});
+/**
+ * Obtener un comentario especifico
+ */
+$router->get('/{id}', [
+    'as' => 'getComment',
+    'uses' => 'Api\Microservices\Comments\CommentsController@show'
+]);
+
+/**
+ * Crear un comentario
+ */
+$router->post('/', [
+    'as' => 'createComment',
+    'uses' => 'Api\Microservices\Comments\CommentsController@create'
+]);
+
+/**
+ * Actualizar un comentario especifico
+ */
+$router->put('/{id}', [
+    'as' => 'updateComment',
+    'uses' => 'Api\Microservices\Comments\CommentsController@update'
+]);
+
+/**
+ * Eliminar un comentario especifico
+ */
+$router->delete('/{id}', [
+    'as' => 'deleteComment',
+    'uses' => 'Api\Microservices\Comments\CommentsController@destroy'
+]);

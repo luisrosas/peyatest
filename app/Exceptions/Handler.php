@@ -3,11 +3,14 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Http\Response;
+use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -45,6 +48,65 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        return parent::render($request, $exception);
+        $out = $this->setExceptionResponse($exception);
+        if (!empty($out)) {
+            return response()->json($out['data'], $out['code']);
+        }
+    }
+
+    private function setExceptionResponse(Exception $exception)
+    {
+        $out = [];
+        if ($exception instanceof QueryException) {
+            $codeException = 0;
+            if (isset($exception->errorInfo[1])) {
+                $codeException = $exception->errorInfo[1];
+            }
+            if ($codeException == 1062) {
+                $out['code'] = Response::HTTP_CONFLICT;
+                $out['data'] = $this->formatterErrorResponse(
+                    'Query exception',
+                    'Already exist a comment for this purchase',
+                    $out['code']
+                );
+            }
+        } else if ($exception instanceof ModelNotFoundException) {
+            $model = strtolower(class_basename($exception->getModel()));
+            $out['code'] = Response::HTTP_NOT_FOUND;
+            $out['data'] = $this->formatterErrorResponse(
+                'Instance not found',
+                "Don't exist instance of {$model} with the specified id",
+                $out['code']
+            );
+        } else if ($exception instanceof NotFoundHttpException) {
+            $out['code'] = Response::HTTP_NOT_FOUND;
+            $out['data'] = $this->formatterErrorResponse(
+                'Not found http',
+                'The specified URL could not be found',
+                $out['code']
+            );
+        } else {
+            $out['code'] = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $out['data'] = $this->formatterErrorResponse(
+                'Internal server error',
+                'Internal error has occurred, try again',
+                $out['code']
+            );
+        }
+
+        return $out;
+    }
+
+    private function formatterErrorResponse($title, $details, $code)
+    {
+        $data = [
+            'error' => [
+                'status' => $code,
+                'title' => $title,
+                'details' => $details,
+            ]
+        ];
+
+        return $data;
     }
 }

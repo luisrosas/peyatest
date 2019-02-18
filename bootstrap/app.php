@@ -101,7 +101,7 @@ if (env('APP_ENV') === 'local') {
 $app->router->group([
     'namespace' => 'App\Http\Controllers\Api\Microservices\Comments',
     'as' => 'api.comments',
-    'prefix' => 'api/comments'
+    'prefix' => 'api'
 ], function ($router) {
     require __DIR__.'/../routes/api.comments.php';
 });

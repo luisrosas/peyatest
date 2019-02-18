@@ -33,4 +33,14 @@ class Comment extends Model
         $this->score = $data['score'];
         $this->save();
     }
+
+    public function getCommentByPurchase($purchaseId)
+    {
+        return $this->wherePurchaseId($purchaseId)->firstOrFail();
+    }
+
+    public function getCommentsByShop($shopId)
+    {
+        return $this->whereShopId($shopId)->get();
+    }
 }

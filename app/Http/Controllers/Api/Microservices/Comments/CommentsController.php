@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Microservices\Comments;
 
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CommentsController extends BaseCommentsController
 {
@@ -11,13 +12,13 @@ class CommentsController extends BaseCommentsController
     public function index()
     {
         $comments = Comment::all();
-        return response()->json($comments);
+        return response()->json($comments, Response::HTTP_OK);
     }
 
     public function show($id)
     {
         $comment = Comment::findOrFail($id);
-        return response()->json($comment);
+        return response()->json($comment, Response::HTTP_OK);
     }
 
     public function create(Request $request)
@@ -33,10 +34,10 @@ class CommentsController extends BaseCommentsController
 
         $comment = Comment::create($request->all());
 
-        return response()->json($comment);
+        return response()->json($comment, Response::HTTP_CREATED);
     }
 
-    public function update($id, Request $request)
+    public function update(Request $request, $commentId)
     {
         $rules = [
             'shop_id' => 'required|integer',
@@ -46,16 +47,30 @@ class CommentsController extends BaseCommentsController
         ];
         $this->validate($request, $rules);
 
-        $comment = Comment::findOrFail($id);
+        $comment = Comment::findOrFail($commentId);
         $comment->updateData($request->all());
 
-        return response()->json($comment);
+        return response()->json($comment, Response::HTTP_OK);
     }
 
-    public function destroy($id)
+    public function destroy($commentId)
     {
-        $comment = Comment::findOrFail($id);
+        $comment = Comment::findOrFail($commentId);
         $comment->delete();
-        return response()->json($comment);
+        return response()->json($comment, Response::HTTP_OK);
+    }
+
+    public function showCommentByPurchase($purchaseId)
+    {
+        $comment = new Comment;
+        $commentByPurchase = $comment->getCommentByPurchase($purchaseId);
+        return response()->json($commentByPurchase, Response::HTTP_OK);
+    }
+
+    public function showCommentsByShop($shopId)
+    {
+        $comment = new Comment;
+        $commentByShop = $comment->getCommentsByShop($shopId);
+        return response()->json($commentByShop, Response::HTTP_OK);
     }
 }

@@ -7,8 +7,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Comment extends Model
 {
+    // Implementación de borrado suave en comentarios
     use SoftDeletes;
 
+    /**
+     * Atributos asignables en masa.
+     *
+     * @var array
+     */
     protected $fillable = [
         'shop_id',
         'purchase_id',
@@ -19,10 +25,32 @@ class Comment extends Model
         'updated_at'
     ];
 
+    /**
+     * Atributos que deben estar ocultos
+     *
+     * @var array
+     */
     protected $hidden = [
         'deleted_at'
     ];
 
+    /**
+     * Casting para los atributos
+     *
+     * @var array
+     */
+    protected $casts = [
+        'shop_id' => 'integer',
+        'purchase_id' => 'integer',
+        'user_id' => 'integer',
+        'score' => 'integer',
+    ];
+
+    /**
+     * Actualiza los datos de un comentario en la base de datos
+     *
+     * @return void
+     */
     public function updateData($data)
     {
         $this->shop_id = $data['shop_id'];
@@ -33,11 +61,21 @@ class Comment extends Model
         $this->save();
     }
 
+    /**
+     * Obtiene el comentario para una compra.
+     *
+     * @return \App\Models\Comment
+     */
     public function getCommentByPurchase($purchaseId)
     {
         return $this->wherePurchaseId($purchaseId)->firstOrFail();
     }
 
+    /**
+     * Obtiene los comentarios para una tienda.
+     *
+     * @return \App\Models\Comment
+     */
     public function getCommentsByShop($shopId)
     {
         return $this->whereShopId($shopId)->get();

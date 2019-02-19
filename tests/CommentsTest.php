@@ -8,6 +8,7 @@ class CommentsTest extends TestCase
 {
     use DatabaseMigrations, DatabaseTransactions;
 
+    // Estructura de respuesta de un comentario
     private $structureData = [
         "id",
         "shop_id",
@@ -18,6 +19,8 @@ class CommentsTest extends TestCase
         "created_at",
         "updated_at"
     ];
+
+    // Estructura de respuesta de error
     private $structureError = [
         "error" => [
             'status',
@@ -27,7 +30,7 @@ class CommentsTest extends TestCase
     ];
 
     /**
-     * A basic test example.
+     * Test obtener todos los comentarios activos
      *
      * @return void
      */
@@ -40,6 +43,11 @@ class CommentsTest extends TestCase
             ->seeJsonStructure([$this->structureData]);
     }
 
+    /**
+     * Test obtener un comentario específico
+     *
+     * @return void
+     */
     public function testGetSpecificComment()
     {
         $commentsToCreate = rand(1, 5);
@@ -54,6 +62,11 @@ class CommentsTest extends TestCase
             ]);
     }
 
+    /**
+     * Test crear comentario
+     *
+     * @return void
+     */
     public function testCreateSpecificComment()
     {
         $data = [
@@ -70,6 +83,11 @@ class CommentsTest extends TestCase
             ->seeJson($data);
     }
 
+    /**
+     * Test crear comentario duplicado para una compra
+     *
+     * @return void
+     */
     public function testCreateDuplicateComment()
     {
         $commentsToCreate = rand(1, 5);
@@ -88,7 +106,12 @@ class CommentsTest extends TestCase
             ->seeJsonStructure([$this->structureError]);
     }
 
-    public function testValidateFiels()
+    /**
+     * Test validador de campos de entrada al crear y actualizar comentarios
+     *
+     * @return void
+     */
+    public function testValidateFields()
     {
         $data = [];
         $url = '/api/comments';
@@ -100,8 +123,21 @@ class CommentsTest extends TestCase
             ->seeJson(['title' => 'user_id'])
             ->seeJson(['title' => 'description'])
             ->seeJson(['title' => 'score']);
+
+        $this->put($url . '/1', $data)
+            ->seeStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->seeJsonStructure([$this->structureError])
+            ->seeJson(['title' => 'shop_id'])
+            ->seeJson(['title' => 'user_id'])
+            ->seeJson(['title' => 'description'])
+            ->seeJson(['title' => 'score']);
     }
 
+    /**
+     * Test actualizar un comentario específico
+     *
+     * @return void
+     */
     public function testUpdateSpecificComment()
     {
         $commentsToCreate = rand(1, 2);
@@ -117,6 +153,11 @@ class CommentsTest extends TestCase
             ->seeStatusCode(Response::HTTP_OK);
     }
 
+    /**
+     * Test actualizar comentario con id de compra duplicado
+     *
+     * @return void
+     */
     public function testUpdateDuplicateComment()
     {
         $commentsToCreate = 2;
@@ -134,6 +175,11 @@ class CommentsTest extends TestCase
             ->seeJsonStructure($this->structureError);
     }
 
+    /**
+     * Test eliminar comentario específico
+     *
+     * @return void
+     */
     public function testDeleteSpecificComment()
     {
         $data = $this->createComments([], 1);
@@ -148,6 +194,11 @@ class CommentsTest extends TestCase
         $this->notSeeInDatabase('comments', ['deleted_at' => null]);
     }
 
+    /**
+     * Test obtener el comentario de una compra
+     *
+     * @return void
+     */
     public function testCommentByPurchase()
     {
         $commentsToCreate = rand(1, 4);
@@ -159,10 +210,15 @@ class CommentsTest extends TestCase
             ->seeStatusCode(Response::HTTP_OK)
             ->seeJsonStructure($this->structureData)
             ->seeJsonContains([
-                'purchase_id' => "$idPurchase"
+                'purchase_id' => $idPurchase
             ]);
     }
 
+    /**
+     * Test obtener los comentarios de una tienda
+     *
+     * @return void
+     */
     public function testCommentByShop()
     {
         $idShop = 3;
@@ -175,10 +231,15 @@ class CommentsTest extends TestCase
             ->seeStatusCode(Response::HTTP_OK)
             ->seeJsonStructure([$this->structureData])
             ->seeJsonContains([
-                'shop_id' => "$idShop"
+                'shop_id' => $idShop
             ]);
     }
 
+    /**
+     * Test comentario no existente
+     *
+     * @return void
+     */
     public function testModelNotFound()
     {
         $url = '/api/comments/1';
@@ -187,6 +248,11 @@ class CommentsTest extends TestCase
             ->seeJsonStructure($this->structureError);
     }
 
+    /**
+     * Test URL no existente
+     *
+     * @return void
+     */
     public function testHttpNotFound()
     {
         $url = '/api/comments/all/1';
@@ -195,6 +261,11 @@ class CommentsTest extends TestCase
             ->seeJsonStructure($this->structureError);
     }
 
+    /**
+     * Test error inesperado
+     *
+     * @return void
+     */
     public function testError500()
     {
         $data = [
@@ -211,6 +282,7 @@ class CommentsTest extends TestCase
             ->seeJsonStructure($this->structureError);
     }
 
+    // Creacion de comentadion en base de datos por medio del factory
     private function createComments($data = [], $commentsCount = 1)
     {
         return factory(\App\Models\Comment::class, $commentsCount)

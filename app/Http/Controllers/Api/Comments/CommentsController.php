@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Api\Microservices\Comments;
+namespace App\Http\Controllers\Api\Comments;
 
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Controllers\Controller;
 
-class CommentsController extends BaseCommentsController
+// Controlador para gestionar los comentarios
+class CommentsController extends Controller
 {
     // Reglas para validar datos de request
     private $rules = [
@@ -18,21 +20,36 @@ class CommentsController extends BaseCommentsController
     ];
 
     /**
-     * Retorna todos los comentarios activos
+     * Retorna todos los comentarios activos.
+     * 
+     * @return \Illuminate\Http\Response
      */
     public function index()
     {
         $comments = Comment::all();
+
         return response()->json($comments, Response::HTTP_OK);
     }
 
-    public function show($id)
+    /**
+     * Retorna el comentario solicitado, solo si este esta activo.
+     *
+     * @param int $commentId Id del comentario
+     * @return \Illuminate\Http\Response
+     */
+    public function show($commentId)
     {
-        $comment = Comment::findOrFail($id);
+        $comment = Comment::findOrFail($commentId);
 
         return response()->json($comment, Response::HTTP_OK);
     }
 
+    /**
+     * Crea un nuevo comentario si pasa las validaciones.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
     public function create(Request $request)
     {
         $this->validate($request, $this->rules);
@@ -42,6 +59,13 @@ class CommentsController extends BaseCommentsController
         return response()->json($comment, Response::HTTP_CREATED);
     }
 
+    /**
+     * Actualiza un comentario específico.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int                      $commentId Id del comentario
+     * @return \Illuminate\Http\Response
+     */
     public function update(Request $request, $commentId)
     {
         unset($this->rules['purchase_id']);
@@ -53,24 +77,45 @@ class CommentsController extends BaseCommentsController
         return response()->json($comment, Response::HTTP_OK);
     }
 
+    /**
+     * Elimina el comentario indicado.
+     *
+     * @param int $commentId Id del comentario
+     * @return \Illuminate\Http\Response
+     */
     public function destroy($commentId)
     {
         $comment = Comment::findOrFail($commentId);
         $comment->delete();
+
         return response()->json($comment, Response::HTTP_OK);
     }
 
+    /**
+     * Retorna el comentario para una compra específica.
+     *
+     * @param int $purchaseId Id de la compra
+     * @return \Illuminate\Http\Response
+     */
     public function showCommentByPurchase($purchaseId)
     {
         $comment = new Comment;
         $commentByPurchase = $comment->getCommentByPurchase($purchaseId);
+
         return response()->json($commentByPurchase, Response::HTTP_OK);
     }
 
+    /**
+     * Retorna los comentarios pertenecientes a una tienda.
+     *
+     * @param int $shopId Id de la tienda
+     * @return \Illuminate\Http\Response
+     */
     public function showCommentsByShop($shopId)
     {
         $comment = new Comment;
         $commentByShop = $comment->getCommentsByShop($shopId);
+
         return response()->json($commentByShop, Response::HTTP_OK);
     }
 }

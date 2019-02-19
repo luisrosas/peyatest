@@ -100,7 +100,7 @@ if (env('APP_ENV') === 'local') {
 */
 
 $app->router->group([
-    'namespace' => 'App\Http\Controllers\Api\Microservices\Comments',
+    'namespace' => 'App\Http\Controllers\Api\Comments',
     'as' => 'api.comments',
     'prefix' => 'api'
 ], function ($router) {

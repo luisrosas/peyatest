@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class Handler extends ExceptionHandler
 {
     /**
-     * A list of the exception types that should not be reported.
+     * Lista de los tipos de excepciones que no deberían ser reportados.
      *
      * @var array
      */
@@ -27,11 +27,9 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * Report or log an exception.
+     * Reporte o log en la excepción.
      *
-     * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
-     *
-     * @param  \Exception  $exception
+     * @param \Exception $exception
      * @return void
      */
     public function report(Exception $exception)
@@ -40,10 +38,10 @@ class Handler extends ExceptionHandler
     }
 
     /**
-     * Render an exception into an HTTP response.
+     * Renderiza una excepción dentro de la respuesta HTTP.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
+     * @param \Illuminate\Http\Request $request
+     * @param \Exception               $exception
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $exception)
@@ -53,6 +51,12 @@ class Handler extends ExceptionHandler
         return response()->json($out['data'], $out['code']);
     }
 
+    /**
+     * Genera la respuesta según la excepción.
+     *
+     * @param \Exception $exception
+     * @return array
+     */
     private function setExceptionResponse(Exception $exception)
     {
         $out = [];
@@ -98,11 +102,17 @@ class Handler extends ExceptionHandler
         return $out;
     }
 
-    private function convertValidationExceptionToResponse(ValidationException $e)
+    /**
+     * Genera la respuesta para la excepcion unprocessable entity.
+     *
+     * @param \Illuminate\Validation\ValidationException $exception
+     * @return array
+     */
+    private function convertValidationExceptionToResponse(ValidationException $exception)
     {
         $code = Response::HTTP_UNPROCESSABLE_ENTITY;
         $data = [];
-        $errors = $e->validator->errors()->getMessages();
+        $errors = $exception->validator->errors()->getMessages();
         foreach ($errors as $error => $value) {
             $data[] = $this->formatterErrorResponse(
                 $error,
@@ -114,6 +124,14 @@ class Handler extends ExceptionHandler
         return ['data' => $data, 'code' => $code];
     }
 
+    /**
+     * Formatea la respuesta de error.
+     *
+     * @param string $title   Titulo del error
+     * @param string $details Detalles del error
+     * @param string $code    Código del error
+     * @return array
+     */
     private function formatterErrorResponse($title, $details, $code)
     {
         return [

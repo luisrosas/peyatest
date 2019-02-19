@@ -10,19 +10,19 @@ class CommentsTest extends TestCase
 
     // Estructura de respuesta de un comentario
     private $structureData = [
-        "id",
-        "shop_id",
-        "purchase_id",
-        "user_id",
-        "description",
-        "score",
-        "created_at",
-        "updated_at"
+        'id',
+        'shop_id',
+        'purchase_id',
+        'user_id',
+        'description',
+        'score',
+        'created_at',
+        'updated_at'
     ];
 
     // Estructura de respuesta de error
     private $structureError = [
-        "error" => [
+        'error' => [
             'status',
             'title',
             'details'
@@ -40,7 +40,7 @@ class CommentsTest extends TestCase
         $url = '/api/comments';
         $this->get($url)
             ->seeStatusCode(Response::HTTP_OK)
-            ->seeJsonStructure([$this->structureData]);
+            ->seeJsonStructure(['data' => [$this->structureData]]);
     }
 
     /**
@@ -56,7 +56,7 @@ class CommentsTest extends TestCase
         $url = '/api/comments/' . $idComment;
         $response = $this->get($url);
         $this->seeStatusCode(Response::HTTP_OK)
-            ->seeJsonStructure($this->structureData)
+            ->seeJsonStructure(['data' => $this->structureData])
             ->seeJson([
                 'id' => $idComment,
             ]);
@@ -79,7 +79,7 @@ class CommentsTest extends TestCase
         $url = '/api/comments';
         $response = $this->post($url, $data);
         $this->seeStatusCode(Response::HTTP_CREATED)
-            ->seeJsonStructure($this->structureData)
+            ->seeJsonStructure(['data' => $this->structureData])
             ->seeJson($data);
     }
 
@@ -208,7 +208,7 @@ class CommentsTest extends TestCase
         $url = '/api/purchases/' . $idPurchase . '/comments';
         $this->get($url)
             ->seeStatusCode(Response::HTTP_OK)
-            ->seeJsonStructure($this->structureData)
+            ->seeJsonStructure(['data' => $this->structureData])
             ->seeJsonContains([
                 'purchase_id' => $idPurchase
             ]);
@@ -229,7 +229,7 @@ class CommentsTest extends TestCase
         $url = '/api/shops/' . $idShop . '/comments';
         $this->get($url)
             ->seeStatusCode(Response::HTTP_OK)
-            ->seeJsonStructure([$this->structureData])
+            ->seeJsonStructure(['data' => [$this->structureData]])
             ->seeJsonContains([
                 'shop_id' => $idShop
             ]);

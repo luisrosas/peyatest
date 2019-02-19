@@ -26,7 +26,7 @@ class CommentsController extends Controller
      */
     public function index()
     {
-        $comments = Comment::all();
+        $comments = Comment::simplePaginate();
 
         return response()->json($comments, Response::HTTP_OK);
     }
@@ -41,7 +41,12 @@ class CommentsController extends Controller
     {
         $comment = Comment::findOrFail($commentId);
 
-        return response()->json($comment, Response::HTTP_OK);
+        return response()->json(
+            [
+                'data' => $comment
+            ],
+            Response::HTTP_OK
+        );
     }
 
     /**
@@ -56,7 +61,12 @@ class CommentsController extends Controller
 
         $comment = Comment::create($request->all());
 
-        return response()->json($comment, Response::HTTP_CREATED);
+        return response()->json(
+            [
+                'data' => $comment
+            ],
+            Response::HTTP_CREATED
+        );
     }
 
     /**
@@ -74,7 +84,12 @@ class CommentsController extends Controller
         $comment = Comment::findOrFail($commentId);
         $comment->updateData($request->all());
 
-        return response()->json($comment, Response::HTTP_OK);
+        return response()->json(
+            [
+                'data' => $comment
+            ],
+            Response::HTTP_OK
+        );
     }
 
     /**
@@ -88,7 +103,12 @@ class CommentsController extends Controller
         $comment = Comment::findOrFail($commentId);
         $comment->delete();
 
-        return response()->json($comment, Response::HTTP_OK);
+        return response()->json(
+            [
+                'data' => $comment
+            ],
+            Response::HTTP_OK
+        );
     }
 
     /**
@@ -102,7 +122,12 @@ class CommentsController extends Controller
         $comment = new Comment;
         $commentByPurchase = $comment->getCommentByPurchase($purchaseId);
 
-        return response()->json($commentByPurchase, Response::HTTP_OK);
+        return response()->json(
+            [
+                'data' => $commentByPurchase
+            ],
+            Response::HTTP_OK
+        );
     }
 
     /**

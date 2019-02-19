@@ -78,6 +78,6 @@ class Comment extends Model
      */
     public function getCommentsByShop($shopId)
     {
-        return $this->whereShopId($shopId)->get();
+        return $this->whereShopId($shopId)->simplePaginate();
     }
 }

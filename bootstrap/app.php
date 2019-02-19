@@ -85,6 +85,7 @@ $app->singleton(
 if (env('APP_ENV') === 'local') {
     $app->bind(Illuminate\Database\ConnectionResolverInterface::class, Illuminate\Database\ConnectionResolver::class);
     $app->register(Niellles\LumenCommands\LumenCommandsServiceProvider::class);
+    $app->register(Appzcoder\LumenRoutesList\RoutesCommandServiceProvider::class);
 }
 
 /*

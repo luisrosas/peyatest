@@ -49,20 +49,21 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $exception)
     {
         $out = $this->setExceptionResponse($exception);
-        if (!empty($out)) {
-            return response()->json($out['data'], $out['code']);
-        }
+
+        return response()->json($out['data'], $out['code']);
     }
 
     private function setExceptionResponse(Exception $exception)
     {
         $out = [];
-        if ($exception instanceof QueryException) {
+        if ($exception instanceof ValidationException) {
+            $out = $this->convertValidationExceptionToResponse($exception);
+        } else if ($exception instanceof QueryException) {
             $codeException = 0;
             if (isset($exception->errorInfo[1])) {
                 $codeException = $exception->errorInfo[1];
             }
-            if ($codeException == 1062) {
+            if ($codeException == 1062 || $codeException == 19) {
                 $out['code'] = Response::HTTP_CONFLICT;
                 $out['data'] = $this->formatterErrorResponse(
                     'Query exception',
@@ -97,16 +98,30 @@ class Handler extends ExceptionHandler
         return $out;
     }
 
+    private function convertValidationExceptionToResponse(ValidationException $e)
+    {
+        $code = Response::HTTP_UNPROCESSABLE_ENTITY;
+        $data = [];
+        $errors = $e->validator->errors()->getMessages();
+        foreach ($errors as $error => $value) {
+            $data[] = $this->formatterErrorResponse(
+                $error,
+                $value,
+                $code
+            );
+        }
+
+        return ['data' => $data, 'code' => $code];
+    }
+
     private function formatterErrorResponse($title, $details, $code)
     {
-        $data = [
+        return [
             'error' => [
                 'status' => $code,
                 'title' => $title,
                 'details' => $details,
             ]
         ];
-
-        return $data;
     }
 }

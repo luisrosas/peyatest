@@ -8,7 +8,18 @@ use Illuminate\Http\Response;
 
 class CommentsController extends BaseCommentsController
 {
+    // Reglas para validar datos de request
+    private $rules = [
+        'shop_id' => 'required|integer',
+        'purchase_id' => 'required|integer|unique:comments,purchase_id',
+        'user_id' => 'required|integer',
+        'description' => 'required',
+        'score' => 'required|integer|between:1,5'
+    ];
 
+    /**
+     * Retorna todos los comentarios activos
+     */
     public function index()
     {
         $comments = Comment::all();
@@ -18,19 +29,13 @@ class CommentsController extends BaseCommentsController
     public function show($id)
     {
         $comment = Comment::findOrFail($id);
+
         return response()->json($comment, Response::HTTP_OK);
     }
 
     public function create(Request $request)
     {
-        $rules = [
-            'shop_id' => 'required|integer',
-            'purchase_id' => 'required|integer|unique:comments,purchase_id',
-            'user_id' => 'required|integer',
-            'description' => 'required',
-            'score' => 'required|integer|between:1,5'
-        ];
-        $this->validate($request, $rules);
+        $this->validate($request, $this->rules);
 
         $comment = Comment::create($request->all());
 
@@ -39,13 +44,8 @@ class CommentsController extends BaseCommentsController
 
     public function update(Request $request, $commentId)
     {
-        $rules = [
-            'shop_id' => 'required|integer',
-            'user_id' => 'required|integer',
-            'description' => 'required',
-            'score' => 'required|integer|between:1,5'
-        ];
-        $this->validate($request, $rules);
+        unset($this->rules['purchase_id']);
+        $this->validate($request, $this->rules);
 
         $comment = Comment::findOrFail($commentId);
         $comment->updateData($request->all());

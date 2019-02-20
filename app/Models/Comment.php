@@ -10,19 +10,29 @@ class Comment extends Model
     // Implementación de borrado suave en comentarios
     use SoftDeletes;
 
+    // Campos de la tabla
+    const SHOP_ID_FIELD = 'shop_id';
+    const PUCHASE_ID_FIELD = 'purchase_id';
+    const USER_ID_FIELD = 'user_id';
+    const DESCRIPTION_ID_FIELD = 'description';
+    const SCORE_ID_FIELD = 'score';
+    const CREATED_AT_FIELD = 'created_at';
+    const UPDATED_AT_FIELD = 'updated_at';
+
+    // Tipos de datos
+    const TYPE_INTEGER = 'integer';
+
     /**
      * Atributos asignables en masa.
      *
      * @var array
      */
     protected $fillable = [
-        'shop_id',
-        'purchase_id',
-        'user_id',
-        'description',
-        'score',
-        'created_at',
-        'updated_at'
+        self::SHOP_ID_FIELD,
+        self::PUCHASE_ID_FIELD,
+        self::USER_ID_FIELD,
+        self::DESCRIPTION_ID_FIELD,
+        self::SCORE_ID_FIELD
     ];
 
     /**
@@ -40,10 +50,10 @@ class Comment extends Model
      * @var array
      */
     protected $casts = [
-        'shop_id' => 'integer',
-        'purchase_id' => 'integer',
-        'user_id' => 'integer',
-        'score' => 'integer',
+        self::SHOP_ID_FIELD => self::TYPE_INTEGER,
+        self::PUCHASE_ID_FIELD => self::TYPE_INTEGER,
+        self::USER_ID_FIELD => self::TYPE_INTEGER,
+        self::SCORE_ID_FIELD => self::TYPE_INTEGER,
     ];
 
     /**
@@ -53,11 +63,11 @@ class Comment extends Model
      */
     public function updateData($data)
     {
-        $this->shop_id = $data['shop_id'];
-        $this->purchase_id = $data['purchase_id'];
-        $this->user_id = $data['user_id'];
-        $this->description = $data['description'];
-        $this->score = $data['score'];
+        $this->shop_id = $data[self::SHOP_ID_FIELD];
+        $this->purchase_id = $data[self::PUCHASE_ID_FIELD];
+        $this->user_id = $data[self::USER_ID_FIELD];
+        $this->description = $data[self::DESCRIPTION_ID_FIELD];
+        $this->score = $data[self::SCORE_ID_FIELD];
         $this->save();
     }
 
@@ -78,6 +88,6 @@ class Comment extends Model
      */
     public function getCommentsByShop($shopId)
     {
-        return $this->whereShopId($shopId)->simplePaginate();
+        return $this->whereShopId($shopId)->paginate();
     }
 }

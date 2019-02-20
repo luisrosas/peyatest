@@ -6,6 +6,7 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use App\Transformers\Api\Comments\CommentTransformer;
 
 // Controlador para gestionar los comentarios
 class CommentsController extends Controller
@@ -26,9 +27,13 @@ class CommentsController extends Controller
      */
     public function index()
     {
-        $comments = Comment::simplePaginate();
+        $comments = Comment::paginate();
 
-        return response()->json($comments, Response::HTTP_OK);
+        return response()->collection(
+            $comments,
+            new CommentTransformer,
+            Response::HTTP_OK
+        );
     }
 
     /**
@@ -41,10 +46,9 @@ class CommentsController extends Controller
     {
         $comment = Comment::findOrFail($commentId);
 
-        return response()->json(
-            [
-                'data' => $comment
-            ],
+        return response()->item(
+            $comment,
+            new CommentTransformer,
             Response::HTTP_OK
         );
     }
@@ -61,10 +65,9 @@ class CommentsController extends Controller
 
         $comment = Comment::create($request->all());
 
-        return response()->json(
-            [
-                'data' => $comment
-            ],
+        return response()->item(
+            $comment,
+            new CommentTransformer,
             Response::HTTP_CREATED
         );
     }
@@ -84,10 +87,9 @@ class CommentsController extends Controller
         $comment = Comment::findOrFail($commentId);
         $comment->updateData($request->all());
 
-        return response()->json(
-            [
-                'data' => $comment
-            ],
+        return response()->item(
+            $comment,
+            new CommentTransformer,
             Response::HTTP_OK
         );
     }
@@ -103,10 +105,9 @@ class CommentsController extends Controller
         $comment = Comment::findOrFail($commentId);
         $comment->delete();
 
-        return response()->json(
-            [
-                'data' => $comment
-            ],
+        return response()->item(
+            $comment,
+            new CommentTransformer,
             Response::HTTP_OK
         );
     }
@@ -122,10 +123,9 @@ class CommentsController extends Controller
         $comment = new Comment;
         $commentByPurchase = $comment->getCommentByPurchase($purchaseId);
 
-        return response()->json(
-            [
-                'data' => $commentByPurchase
-            ],
+        return response()->item(
+            $commentByPurchase,
+            new CommentTransformer,
             Response::HTTP_OK
         );
     }
@@ -141,6 +141,10 @@ class CommentsController extends Controller
         $comment = new Comment;
         $commentByShop = $comment->getCommentsByShop($shopId);
 
-        return response()->json($commentByShop, Response::HTTP_OK);
+        return response()->collection(
+            $commentByShop,
+            new CommentTransformer,
+            Response::HTTP_OK
+        );
     }
 }

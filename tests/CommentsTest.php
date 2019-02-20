@@ -8,16 +8,38 @@ class CommentsTest extends TestCase
 {
     use DatabaseMigrations, DatabaseTransactions;
 
-    // Estructura de respuesta de un comentario
-    private $structureData = [
-        'id',
-        'shop_id',
-        'purchase_id',
-        'user_id',
-        'description',
-        'score',
-        'created_at',
-        'updated_at'
+    // Estructura de respuesta de un item de comentarios
+    private $structureDataItem = [
+        'data' => [
+            'type',
+            'id',
+            'attributes' => [
+                'shop_id',
+                'purchase_id',
+                'user_id',
+                'description',
+                'score',
+                'created_at',
+                'updated_at'
+            ]
+        ]
+    ];
+
+    // Estructura de respuesta de una colección de comentarios
+    private $structureDataCollection = [
+        'data' => [[
+            'type',
+            'id',
+            'attributes' => [
+                'shop_id',
+                'purchase_id',
+                'user_id',
+                'description',
+                'score',
+                'created_at',
+                'updated_at'
+            ]
+        ]]
     ];
 
     // Estructura de respuesta de error
@@ -40,7 +62,7 @@ class CommentsTest extends TestCase
         $url = '/api/comments';
         $this->get($url)
             ->seeStatusCode(Response::HTTP_OK)
-            ->seeJsonStructure(['data' => [$this->structureData]]);
+            ->seeJsonStructure($this->structureDataCollection);
     }
 
     /**
@@ -54,11 +76,11 @@ class CommentsTest extends TestCase
         $data = $this->createComments([], $commentsToCreate);
         $idComment = $data->random()->id;
         $url = '/api/comments/' . $idComment;
-        $response = $this->get($url);
-        $this->seeStatusCode(Response::HTTP_OK)
-            ->seeJsonStructure(['data' => $this->structureData])
-            ->seeJson([
-                'id' => $idComment,
+        $this->get($url)
+            ->seeStatusCode(Response::HTTP_OK)
+            ->seeJsonStructure($this->structureDataItem)
+            ->seeJsonContains([
+                'id' => (string) $idComment,
             ]);
     }
 
@@ -77,9 +99,9 @@ class CommentsTest extends TestCase
             'score' => 4,
         ];
         $url = '/api/comments';
-        $response = $this->post($url, $data);
-        $this->seeStatusCode(Response::HTTP_CREATED)
-            ->seeJsonStructure(['data' => $this->structureData])
+        $this->post($url, $data)
+            ->seeStatusCode(Response::HTTP_CREATED)
+            ->seeJsonStructure($this->structureDataItem)
             ->seeJson($data);
     }
 
@@ -208,7 +230,7 @@ class CommentsTest extends TestCase
         $url = '/api/purchases/' . $idPurchase . '/comments';
         $this->get($url)
             ->seeStatusCode(Response::HTTP_OK)
-            ->seeJsonStructure(['data' => $this->structureData])
+            ->seeJsonStructure($this->structureDataItem)
             ->seeJsonContains([
                 'purchase_id' => $idPurchase
             ]);
@@ -229,57 +251,10 @@ class CommentsTest extends TestCase
         $url = '/api/shops/' . $idShop . '/comments';
         $this->get($url)
             ->seeStatusCode(Response::HTTP_OK)
-            ->seeJsonStructure(['data' => [$this->structureData]])
+            ->seeJsonStructure($this->structureDataCollection)
             ->seeJsonContains([
                 'shop_id' => $idShop
             ]);
-    }
-
-    /**
-     * Test comentario no existente
-     *
-     * @return void
-     */
-    public function testModelNotFound()
-    {
-        $url = '/api/comments/1';
-        $this->get($url)
-            ->seeStatusCode(Response::HTTP_NOT_FOUND)
-            ->seeJsonStructure($this->structureError);
-    }
-
-    /**
-     * Test URL no existente
-     *
-     * @return void
-     */
-    public function testHttpNotFound()
-    {
-        $url = '/api/comments/all/1';
-        $this->get($url)
-            ->seeStatusCode(Response::HTTP_NOT_FOUND)
-            ->seeJsonStructure($this->structureError);
-    }
-
-    /**
-     * Test error inesperado
-     *
-     * @return void
-     */
-    public function testError500()
-    {
-        $data = [
-            'shop_id' => 100,
-            'purchase_id' => 100,
-            'user_id' => 100,
-            'description' => 100,
-            'score' => 4,
-            'created_at' => 'Date'
-        ];
-        $url = '/api/comments';
-        $response = $this->post($url, $data)
-            ->seeStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR)
-            ->seeJsonStructure($this->structureError);
     }
 
     // Creacion de comentadion en base de datos por medio del factory
